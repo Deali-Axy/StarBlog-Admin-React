@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {PageContainer} from "@ant-design/pro-components";
-import {Divider, List, Typography} from 'antd';
+import {Divider, List} from 'antd';
 import {getBlogPost} from "@/services/blog/BlogPost";
 
 const PostList: React.FC = () => {

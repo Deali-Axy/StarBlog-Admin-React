@@ -19,7 +19,14 @@ export default [
       {path: '/blog/posts', name: '文章列表', component: './blog/PostList'}
     ]
   },
-
+  {
+    path: '/photo',
+    name: '照片',
+    icon: 'crown',
+    routes: [
+      {path: '/photo/list', name: '照片列表', component: './photo/PhotoList'}
+    ]
+  },
   {
     path: '/admin',
     name: '管理页',
