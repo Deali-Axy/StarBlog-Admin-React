@@ -12,6 +12,7 @@ const {Meta} = Card;
 
 const PhotoList: React.FC = () => {
   const baseUrl = "http://localhost:5038"
+  const [pageSize, setPageSize] = useState(5)
 
   const {data, error, loading, run} = useRequest(
     (values: any = {page: 1, pageSize: 5}) => {
@@ -37,14 +38,15 @@ const PhotoList: React.FC = () => {
           md: 3,
           lg: 3,
           xl: 4,
-          xxl: 5,
+          xxl: 6,
         }}
         pagination={{
           total: data?.pagination?.totalItemCount,
-          pageSize: 5,
+          pageSize: pageSize,
           showSizeChanger: true,
           pageSizeOptions: [5, 10, 20],
           onChange: (page, pageSize) => {
+            setPageSize(pageSize)
             run({page, pageSize})
           }
         }}
@@ -52,7 +54,7 @@ const PhotoList: React.FC = () => {
         renderItem={(item) => (
           <List.Item>
             <Card
-              style={{width: 300}}
+              style={{width: 250}}
               cover={
                 <img
                   alt="example"
