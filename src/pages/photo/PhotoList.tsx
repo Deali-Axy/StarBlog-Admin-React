@@ -1,21 +1,19 @@
 import React, {useState} from "react";
 import {PageContainer} from "@ant-design/pro-components";
-import {EditOutlined, EllipsisOutlined, SettingOutlined} from '@ant-design/icons';
-import {Avatar, Card, List} from 'antd';
+import {Pagination} from 'antd';
 import {useRequest} from 'umi';
-
+import {PhotoCard} from "./components/PhotoCard";
 
 import {getPhoto} from '@/services/blog/Photo'
+import {Masonry} from "@mui/lab";
 
-const {Meta} = Card;
 
 
 const PhotoList: React.FC = () => {
-  const baseUrl = "http://localhost:5038"
-  const [pageSize, setPageSize] = useState(5)
+  const [pageSize, setPageSize] = useState(12)
 
   const {data, error, loading, run} = useRequest(
-    (values: any = {page: 1, pageSize: 5}) => {
+    (values: any = {page: 1, pageSize: pageSize}) => {
       console.log('values', values)
       return getPhoto(values)
     }, {
@@ -27,55 +25,27 @@ const PhotoList: React.FC = () => {
       }
     })
 
+
+
   return (
-    <PageContainer>
-      <List
-        loading={loading}
-        grid={{
-          gutter: 16,
-          xs: 1,
-          sm: 2,
-          md: 3,
-          lg: 3,
-          xl: 4,
-          xxl: 6,
-        }}
-        pagination={{
-          total: data?.pagination?.totalItemCount,
-          pageSize: pageSize,
-          showSizeChanger: true,
-          pageSizeOptions: [5, 10, 20],
-          onChange: (page, pageSize) => {
+    <PageContainer
+      footer={[
+        <Pagination
+          key={0}
+          total={data?.pagination?.totalItemCount}
+          pageSize={pageSize}
+          showSizeChanger={true}
+          pageSizeOptions={[6, 12, 24]}
+          onChange={(page, pageSize) => {
             setPageSize(pageSize)
             run({page, pageSize})
-          }
-        }}
-        dataSource={data?.list}
-        renderItem={(item) => (
-          <List.Item>
-            <Card
-              style={{width: 250}}
-              cover={
-                <img
-                  alt="example"
-                  src={`${baseUrl}/media/photography/${item.id}.jpg`}
-                />
-              }
-              actions={[
-                <SettingOutlined key="setting"/>,
-                <EditOutlined key="edit"/>,
-                <EllipsisOutlined key="ellipsis"/>,
-              ]}
-            >
-              <Meta
-                avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel"/>}
-                title={item.title}
-                description={item.location}
-              />
-            </Card>
-          </List.Item>
-        )}
-      />
+          }}
+        />
+      ]}>
+      <Masonry columns={6} spacing={2}>
+        {/* @ts-ignore */}
+        {data && data.list?.map(item => <PhotoCard key={item.id} photo={item}/>)}
+      </Masonry>
     </PageContainer>
   )
 }
