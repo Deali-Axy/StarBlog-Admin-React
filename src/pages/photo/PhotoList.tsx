@@ -38,9 +38,11 @@ const PhotoList: React.FC = () => {
       console.log(values)
       updatePhoto({id: currentPhoto.id!}, values)
         .then(res => {
+          console.log(res.message)
           messageApi.success(res.message)
           setEditModalOpen(!editModalOpen)
           setCurrentPhoto(undefined)
+          run({page, pageSize})
         })
         .catch(res => {
           messageApi.error(res.message)
@@ -113,6 +115,7 @@ const PhotoList: React.FC = () => {
           }}
         />
       ]}>
+      {contextHolder}
       <Masonry columns={6} spacing={2}>
         {/* @ts-ignore */}
         {data && data.list?.map(item =>
