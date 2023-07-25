@@ -87,10 +87,6 @@ declare namespace API {
     id: number;
   };
 
-  type deletePhotoIdParams = {
-    id: string;
-  };
-
   type FeaturedCategory = {
     id?: number;
     categoryId?: number;
@@ -208,20 +204,6 @@ declare namespace API {
     id: number;
   };
 
-  type getPhotoIdParams = {
-    id: string;
-  };
-
-  type getPhotoIdThumbParams = {
-    id: string;
-    width?: number;
-  };
-
-  type getPhotoParams = {
-    page?: number;
-    pageSize?: number;
-  };
-
   type PaginationMetadata = {
     pageCount?: number;
     totalItemCount?: number;
@@ -243,28 +225,6 @@ declare namespace API {
     height?: number;
     width?: number;
     createTime?: string;
-  };
-
-  type PhotoApiResponse = {
-    statusCode?: number;
-    successful?: boolean;
-    message?: string;
-    data?: Photo;
-  };
-
-  type PhotoApiResponsePaged = {
-    statusCode?: number;
-    successful?: boolean;
-    message?: string;
-    data?: Photo[];
-    pagination?: PaginationMetadata;
-  };
-
-  type PhotoListApiResponse = {
-    statusCode?: number;
-    successful?: boolean;
-    message?: string;
-    data?: Photo[];
   };
 
   type Post = {
@@ -359,14 +319,6 @@ declare namespace API {
     successful?: boolean;
     message?: string;
     data?: Post[];
-  };
-
-  type postPhotoIdCancelFeaturedParams = {
-    id: string;
-  };
-
-  type postPhotoIdSetFeaturedParams = {
-    id: string;
   };
 
   type PostUpdateDto = {

@@ -3,9 +3,9 @@
 import { request } from '@umijs/max';
 
 /** 此处后端没有提供注释 GET /Api/Photo */
-export async function getPhoto(
+export async function getApiPhoto(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getPhotoParams,
+  params: API.getApiPhotoParams,
   options?: { [key: string]: any },
 ) {
   return request<API.PhotoApiResponsePaged>('/Api/Photo', {
@@ -22,7 +22,7 @@ export async function getPhoto(
 }
 
 /**  (Auth) POST /Api/Photo */
-export async function postPhoto(
+export async function postApiPhoto(
   body: {
     /** 作品标题 */
     Title: string;
@@ -42,10 +42,15 @@ export async function postPhoto(
     const item = (body as any)[ele];
 
     if (item !== undefined && item !== null) {
-      formData.append(
-        ele,
-        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
-      );
+      if (typeof item === 'object' && !(item instanceof File)) {
+        if (item instanceof Array) {
+          item.forEach((f) => formData.append(ele, f || ''));
+        } else {
+          formData.append(ele, JSON.stringify(item));
+        }
+      } else {
+        formData.append(ele, item);
+      }
     }
   });
 
@@ -58,9 +63,9 @@ export async function postPhoto(
 }
 
 /** 此处后端没有提供注释 GET /Api/Photo/${param0} */
-export async function getPhotoId(
+export async function getId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getPhotoIdParams,
+  params: API.getIdParams,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
@@ -71,10 +76,29 @@ export async function getPhotoId(
   });
 }
 
-/**  (Auth) DELETE /Api/Photo/${param0} */
-export async function deletePhotoId(
+/**  (Auth) PUT /Api/Photo/${param0} */
+export async function putId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.deletePhotoIdParams,
+  params: API.putIdParams,
+  body: API.PhotoUpdateDto,
+  options?: { [key: string]: any },
+) {
+  const { id: param0, ...queryParams } = params;
+  return request<API.PhotoApiResponse>(`/Api/Photo/${param0}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params: { ...queryParams },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/**  (Auth) DELETE /Api/Photo/${param0} */
+export async function deleteId(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.deleteIdParams,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
@@ -86,9 +110,9 @@ export async function deletePhotoId(
 }
 
 /** 取消推荐 POST /Api/Photo/${param0}/CancelFeatured */
-export async function postPhotoIdCancelFeatured(
+export async function postIdCancelFeatured(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.postPhotoIdCancelFeaturedParams,
+  params: API.postIdCancelFeaturedParams,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
@@ -100,9 +124,9 @@ export async function postPhotoIdCancelFeatured(
 }
 
 /** 设置为推荐图片 POST /Api/Photo/${param0}/SetFeatured */
-export async function postPhotoIdSetFeatured(
+export async function postIdSetFeatured(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.postPhotoIdSetFeaturedParams,
+  params: API.postIdSetFeaturedParams,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
@@ -113,10 +137,10 @@ export async function postPhotoIdSetFeatured(
   });
 }
 
-/** 此处后端没有提供注释 GET /Api/Photo/${param0}/Thumb */
-export async function getPhotoIdThumb(
+/** 获取指定宽度的缩略图 GET /Api/Photo/${param0}/Thumb */
+export async function getIdThumb(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getPhotoIdThumbParams,
+  params: API.getIdThumbParams,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
@@ -132,7 +156,7 @@ export async function getPhotoIdThumb(
 }
 
 /** 批量导入图片 POST /Api/Photo/BatchImport */
-export async function postPhotoBatchImport(options?: { [key: string]: any }) {
+export async function postBatchImport(options?: { [key: string]: any }) {
   return request<API.PhotoListApiResponse>('/Api/Photo/BatchImport', {
     method: 'POST',
     ...(options || {}),
@@ -140,7 +164,7 @@ export async function postPhotoBatchImport(options?: { [key: string]: any }) {
 }
 
 /** 重建图片库数据（重新扫描每张图片的大小等数据） POST /Api/Photo/ReBuildData */
-export async function postPhotoReBuildData(options?: { [key: string]: any }) {
+export async function postReBuildData(options?: { [key: string]: any }) {
   return request<API.ApiResponse>('/Api/Photo/ReBuildData', {
     method: 'POST',
     ...(options || {}),

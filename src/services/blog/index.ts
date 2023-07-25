@@ -8,7 +8,6 @@ import * as Category from './Category';
 import * as FeaturedCategory from './FeaturedCategory';
 import * as FeaturedPhoto from './FeaturedPhoto';
 import * as FeaturedPost from './FeaturedPost';
-import * as Photo from './Photo';
 export default {
   Blog,
   BlogPost,
@@ -16,5 +15,4 @@ export default {
   FeaturedCategory,
   FeaturedPhoto,
   FeaturedPost,
-  Photo,
 };

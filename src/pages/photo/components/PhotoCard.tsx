@@ -1,19 +1,26 @@
-import React, {useState} from "react";
-import {Avatar, Card, Image} from "antd";
+import React, {MouseEventHandler, useState} from "react";
+import {Avatar, Card, CardProps, Image} from "antd";
 import {EditOutlined, EllipsisOutlined, SettingOutlined} from "@ant-design/icons";
 
 const {Meta} = Card;
 
 const baseUrl = "http://localhost:5038"
 
+interface PhotoCardProps extends CardProps {
+  photo: API.Photo
+  onDetailClick?: MouseEventHandler<HTMLDivElement> | undefined
+  onEditClick?: MouseEventHandler<HTMLDivElement> | undefined
+  onDeleteClick?: MouseEventHandler<HTMLDivElement> | undefined
+}
 
-export const PhotoCard: React.FC<{ photo: API.Photo }> = ({photo}) => {
+export const PhotoCard: React.FC<PhotoCardProps> = ({photo, ...rest}) => {
 
   const imgSrc = `${baseUrl}/media/photography/${photo.id}.jpg`
 
   return (
     <>
       <Card
+        {...rest}
         style={{width: 250, marginBottom: 10}}
         cover={
           <Image
@@ -22,9 +29,9 @@ export const PhotoCard: React.FC<{ photo: API.Photo }> = ({photo}) => {
           />
         }
         actions={[
-          <SettingOutlined key="setting"/>,
-          <EditOutlined key="edit"/>,
-          <EllipsisOutlined key="ellipsis"/>,
+          <SettingOutlined key="detail" onClick={rest.onDetailClick}/>,
+          <EditOutlined key="edit" onClick={rest.onEditClick}/>,
+          <EllipsisOutlined key="delete" onClick={rest.onDeleteClick}/>,
         ]}
       >
         <Meta

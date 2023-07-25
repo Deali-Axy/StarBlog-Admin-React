@@ -148,6 +148,7 @@ export default defineConfig({
     getStarBlogOpenApi('comment'),
     getStarBlogOpenApi('common'),
     getStarBlogOpenApi('link'),
+    getStarBlogOpenApi('photo'),
   ],
   mfsu: {
     strategy: 'normal',
