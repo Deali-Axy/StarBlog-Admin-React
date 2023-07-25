@@ -24,7 +24,9 @@ export default [
     name: '照片',
     icon: 'crown',
     routes: [
-      {path: '/photo/list', name: '照片列表', component: './photo/PhotoList'}
+      {path: '/photo', redirect: '/photo/list'},
+      {path: '/photo/list', name: '照片列表', component: './photo/PhotoList'},
+      {path: '/photo/detail/:id', name: '照片详情', component: './photo/PhotoDetail', hideInMenu: true},
     ]
   },
   {

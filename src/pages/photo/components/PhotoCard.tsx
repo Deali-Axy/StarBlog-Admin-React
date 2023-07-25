@@ -1,20 +1,20 @@
 import React, {MouseEventHandler, useState} from "react";
+import {history} from "@umijs/max";
 import {Avatar, Card, CardProps, Image} from "antd";
-import {EditOutlined, EllipsisOutlined, SettingOutlined} from "@ant-design/icons";
+import {EditOutlined, DeleteOutlined, InfoCircleOutlined} from "@ant-design/icons";
+import {baseUrl} from "@/common";
 
 const {Meta} = Card;
 
-const baseUrl = "http://localhost:5038"
 
 interface PhotoCardProps extends CardProps {
   photo: API.Photo
-  onDetailClick?: MouseEventHandler<HTMLDivElement> | undefined
-  onEditClick?: MouseEventHandler<HTMLDivElement> | undefined
-  onDeleteClick?: MouseEventHandler<HTMLDivElement> | undefined
+  onDetailClick?: MouseEventHandler<HTMLSpanElement> | undefined
+  onEditClick?: MouseEventHandler<HTMLSpanElement> | undefined
+  onDeleteClick?: MouseEventHandler<HTMLSpanElement> | undefined
 }
 
 export const PhotoCard: React.FC<PhotoCardProps> = ({photo, ...rest}) => {
-
   const imgSrc = `${baseUrl}/media/photography/${photo.id}.jpg`
 
   return (
@@ -29,9 +29,15 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({photo, ...rest}) => {
           />
         }
         actions={[
-          <SettingOutlined key="detail" onClick={rest.onDetailClick}/>,
+          <InfoCircleOutlined key="detail" onClick={(e) => {
+            if (rest.onDetailClick) {
+              rest.onDetailClick(e)
+            } else {
+              history.push(`/photo/detail/${photo.id}`)
+            }
+          }}/>,
           <EditOutlined key="edit" onClick={rest.onEditClick}/>,
-          <EllipsisOutlined key="delete" onClick={rest.onDeleteClick}/>,
+          <DeleteOutlined key="delete" onClick={rest.onDeleteClick}/>,
         ]}
       >
         <Meta
