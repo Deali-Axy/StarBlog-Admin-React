@@ -1,19 +1,22 @@
 import React, {useState} from "react";
 import {PageContainer} from "@ant-design/pro-components";
-import {Pagination, Modal, Form, Input, Button, message} from 'antd';
+import {Pagination, Modal, Form, Input, Button, message, Spin} from 'antd';
 import {useRequest} from 'umi';
 import {PhotoCard} from "./components/PhotoCard";
 
-import {getApiPhoto, putId as updatePhoto} from '@/services/photo/Photo'
+import {deleteId as deletePhoto, getApiPhoto, putId as updatePhoto} from '@/services/photo/Photo'
 import {Masonry} from "@mui/lab";
+import {DeleteOutlined} from "@ant-design/icons";
 
 
 const PhotoList: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
+  const [confirmModal, confirmModalContextHolder] = Modal.useModal()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(12)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [currentPhoto, setCurrentPhoto] = useState<API.Photo | undefined>(undefined)
+
 
   const {data, error, loading, run} = useRequest(
     (values: any = {page: 1, pageSize: pageSize}) => {
@@ -28,7 +31,41 @@ const PhotoList: React.FC = () => {
       }
     })
 
-  const EditModal = () => {
+  const PhotoItem: React.FC<{ photo: API.Photo }> = ({photo}) => {
+    const [loading, setLoading] = useState(false)
+
+    function handleDelete(photo: API.Photo) {
+      confirmModal.confirm({
+        title: '确认删除',
+        icon: <DeleteOutlined/>,
+        content: `确认删除图片 ${photo.title} 吗？`,
+        onOk: () => {
+          setLoading(true)
+          deletePhoto({id: photo.id!})
+            .then(res => {
+              messageApi.success(res.message)
+              setLoading(false)
+              run({page, pageSize})
+            })
+        }
+      })
+    }
+
+    return (
+      <Spin spinning={loading}>
+        <PhotoCard
+          photo={photo}
+          onEditClick={() => {
+            setCurrentPhoto(photo)
+            setEditModalOpen(true)
+          }}
+          onDeleteClick={handleDelete}
+        />
+      </Spin>
+    )
+  }
+
+  function EditModal() {
     const [form] = Form.useForm()
     const [loading, setLoading] = useState(false)
 
@@ -100,6 +137,7 @@ const PhotoList: React.FC = () => {
 
   return (
     <PageContainer
+      // loading={loading}
       footer={[
         <Pagination
           key={0}
@@ -115,19 +153,12 @@ const PhotoList: React.FC = () => {
           }}
         />
       ]}>
+      {confirmModalContextHolder}
       {contextHolder}
       {/* todo 修复可能会触发警告的地方 */}
       {data && <Masonry columns={6} spacing={2}>
         {/* @ts-ignore */}
-        {data.list?.map(item =>
-          <PhotoCard
-            key={item.id}
-            photo={item}
-            onEditClick={() => {
-              setCurrentPhoto(item)
-              setEditModalOpen(true)
-            }}
-          />)}
+        {data.list?.map(item => <PhotoItem key={item.id} photo={item}/>)}
       </Masonry>}
       <EditModal/>
     </PageContainer>

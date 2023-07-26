@@ -11,7 +11,6 @@ import {
   CloseCircleOutlined
 } from "@ant-design/icons";
 import {baseUrl} from "@/common";
-import {MenuClickEventHandler} from "rc-menu/lib/interface";
 
 const {Meta} = Card;
 
@@ -20,8 +19,8 @@ export interface PhotoCardProps extends CardProps {
   photo: API.Photo
   onDetailClick?: MouseEventHandler<HTMLSpanElement> | undefined
   onEditClick?: MouseEventHandler<HTMLSpanElement> | undefined
-  // onEditClick?: (...args: any[]) => any
-  onDeleteClick?: MenuClickEventHandler | undefined
+
+  onDeleteClick?(photo: API.Photo): void
 }
 
 export const PhotoCard: React.FC<PhotoCardProps> =
@@ -51,7 +50,9 @@ export const PhotoCard: React.FC<PhotoCardProps> =
         label: '删除',
         danger: true,
         icon: <DeleteOutlined/>,
-        onClick: onDeleteClick
+        onClick: () => {
+          onDeleteClick?.(photo)
+        }
       },
     ]
 
