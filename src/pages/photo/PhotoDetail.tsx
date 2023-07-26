@@ -1,13 +1,15 @@
 import {useParams, useRequest} from 'umi';
 import {PageContainer} from "@ant-design/pro-components";
-import {Empty, Image, Row, Col, Descriptions, Card, Form, Input, Button} from 'antd';
-import React, {useEffect} from "react";
-import {getId as getPhoto} from '@/services/photo/Photo'
+import {Empty, Image, Row, Col, Descriptions, Card, Form, Input, Button, message} from 'antd';
+import React, {useEffect, useState} from "react";
+import {getId as getPhoto, putId as updatePhoto} from '@/services/photo/Photo'
 import {baseUrl} from "@/common";
 
 
 export default function () {
   const params = useParams()
+  const [messageApi, contextHolder] = message.useMessage();
+  const [submitLoading, setSubmitLoading] = useState(false)
   const {data, loading, run} = useRequest((values: any) => {
     if (params.id) return getPhoto({id: params.id})
   })
@@ -16,8 +18,30 @@ export default function () {
     console.log(params)
   }, [])
 
+  function onFormFinish(values: any) {
+    if (!data || !data?.id) {
+      messageApi.warning('无照片数据！')
+      return
+    }
+
+    setSubmitLoading(true)
+    updatePhoto({id: data.id}, values)
+      .then(res => {
+        console.log(res.message)
+        messageApi.success(res.message)
+        run({})
+      })
+      .catch(res => {
+        messageApi.error(res.message)
+      })
+      .finally(() => {
+        setSubmitLoading(false)
+      })
+  }
+
   return (
     <PageContainer>
+      {contextHolder}
       {!params.id && <Empty/>}
       {data && <>
         <Descriptions>
@@ -41,17 +65,13 @@ export default function () {
               style={{margin: 8}}
               initialValues={data}
               autoComplete='off'
-              onFinish={() => {
-              }}
+              onFinish={onFormFinish}
             >
-              <Form.Item label="作品标题" name="title"
-                         rules={[{required: true, message: '请输入作品标题'}]}
-              >
+              <Form.Item label="作品标题" name="title" rules={[{required: true, message: '请输入作品标题'}]}>
                 <Input/>
               </Form.Item>
 
-              <Form.Item label='拍摄地点' name='location'
-                         rules={[{required: true, message: '请输入拍摄地点'}]}>
+              <Form.Item label='拍摄地点' name='location' rules={[{required: true, message: '请输入拍摄地点'}]}>
                 <Input/>
               </Form.Item>
 
@@ -60,7 +80,7 @@ export default function () {
               </Form.Item>
 
               <Form.Item>
-                <Button type="primary" htmlType="submit" loading={loading}>
+                <Button type="primary" htmlType="submit" loading={submitLoading}>
                   提交
                 </Button>
               </Form.Item>

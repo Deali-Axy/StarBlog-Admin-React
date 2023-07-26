@@ -8,7 +8,6 @@ const Settings: ProLayoutProps & {
   logo?: string;
 } = {
   navTheme: 'light',
-  // 拂晓蓝
   colorPrimary: '#ED4192',
   layout: 'mix',
   contentWidth: 'Fluid',
@@ -17,7 +16,7 @@ const Settings: ProLayoutProps & {
   colorWeak: false,
   title: 'StarBlog Admin',
   pwa: true,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: 'https://blog.sblt.deali.cn:9000/images/codelab.jpg',
   iconfontUrl: '',
   token: {
     // 参见ts声明，demo 见文档，通过token 修改样式
