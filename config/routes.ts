@@ -16,7 +16,8 @@ export default [
     name: '文章',
     icon: 'crown',
     routes: [
-      {path: '/blog/posts', name: '文章列表', component: './blog/PostList'}
+      {path: '/blog/posts', name: '文章列表', component: './blog/PostList'},
+      {path: '/blog/comments', name: '评论列表', component: './blog/CommentList'},
     ]
   },
   {
