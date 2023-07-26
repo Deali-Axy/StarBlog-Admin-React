@@ -1,8 +1,17 @@
 import React, {MouseEventHandler, useState} from "react";
 import {history} from "@umijs/max";
-import {Avatar, Card, CardProps, Image} from "antd";
-import {EditOutlined, DeleteOutlined, InfoCircleOutlined} from "@ant-design/icons";
+import {Avatar, Card, CardProps, Image, Dropdown} from "antd";
+import type {MenuProps} from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  InfoCircleOutlined,
+  MenuOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined
+} from "@ant-design/icons";
 import {baseUrl} from "@/common";
+import {MenuClickEventHandler} from "rc-menu/lib/interface";
 
 const {Meta} = Card;
 
@@ -11,11 +20,31 @@ interface PhotoCardProps extends CardProps {
   photo: API.Photo
   onDetailClick?: MouseEventHandler<HTMLSpanElement> | undefined
   onEditClick?: MouseEventHandler<HTMLSpanElement> | undefined
-  onDeleteClick?: MouseEventHandler<HTMLSpanElement> | undefined
+  onDeleteClick?: MenuClickEventHandler | undefined
 }
 
 export const PhotoCard: React.FC<PhotoCardProps> = ({photo, ...rest}) => {
   const imgSrc = `${baseUrl}/media/photography/${photo.id}.jpg`
+
+  const menuItems: MenuProps['items'] = [
+    {
+      key: 'setFeature',
+      label: '设置推荐',
+      icon: <CheckCircleOutlined/>
+    },
+    {
+      key: 'cancelFeature',
+      label: '取消推荐',
+      icon: <CloseCircleOutlined/>
+    },
+    {
+      key: 'delete',
+      label: '删除',
+      danger: true,
+      icon: <DeleteOutlined/>,
+      onClick: rest.onDeleteClick
+    },
+  ]
 
   return (
     <>
@@ -37,7 +66,9 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({photo, ...rest}) => {
             }
           }}/>,
           <EditOutlined key="edit" onClick={rest.onEditClick}/>,
-          <DeleteOutlined key="delete" onClick={rest.onDeleteClick}/>,
+          <Dropdown key='menu' placement='bottom' menu={{items: menuItems}}>
+            <MenuOutlined/>
+          </Dropdown>,
         ]}
       >
         <Meta
