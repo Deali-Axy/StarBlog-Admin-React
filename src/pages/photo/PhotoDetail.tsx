@@ -1,8 +1,8 @@
 import {useParams, useRequest} from 'umi';
 import {PageContainer} from "@ant-design/pro-components";
-import {Empty, Image, Row, Col, Descriptions, Divider, Form, Input, Button, message, Space} from 'antd';
+import {Empty, Image, Row, Col, Descriptions, Divider, Form, Input, Button, message, Space, Modal} from 'antd';
 import React, {useEffect, useState} from "react";
-import {getId as getPhoto, putId as updatePhoto} from '@/services/photo/Photo'
+import {getId as getPhoto, putId as updatePhoto, deleteId as deletePhoto} from '@/services/photo/Photo'
 import {baseUrl} from "@/common";
 import {
   CheckOutlined,
@@ -17,9 +17,11 @@ import {
 
 export default function () {
   const params = useParams()
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const [deleteModal, deleteModalContextHolder] = Modal.useModal()
   const [submitLoading, setSubmitLoading] = useState(false)
-  const {data, loading, run} = useRequest((values: any) => {
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const {data: photo, loading, run} = useRequest((values: any) => {
     if (params.id) return getPhoto({id: params.id})
   })
 
@@ -27,14 +29,37 @@ export default function () {
     console.log(params)
   }, [])
 
-  function onFormFinish(values: any) {
-    if (!data || !data?.id) {
+  function handleDelete() {
+    if (!photo || !photo?.id) {
+      messageApi.warning('无照片数据！')
+      return
+    }
+
+    deleteModal.confirm({
+      title: '确认删除',
+      icon: <DeleteOutlined/>,
+      content: `确认删除图片 ${photo.title} 吗？`,
+      onOk: () => {
+        setDeleteLoading(true)
+        deletePhoto({id: photo.id!})
+          .then(res => {
+            messageApi.success(res.message)
+            history.back()
+          })
+          .finally(() => setDeleteLoading(false))
+      }
+    })
+
+  }
+
+  function handleUpdate(values: any) {
+    if (!photo || !photo?.id) {
       messageApi.warning('无照片数据！')
       return
     }
 
     setSubmitLoading(true)
-    updatePhoto({id: data.id}, values)
+    updatePhoto({id: photo.id}, values)
       .then(res => {
         console.log(res.message)
         messageApi.success(res.message)
@@ -43,43 +68,42 @@ export default function () {
       .catch(res => {
         messageApi.error(res.message)
       })
-      .finally(() => {
-        setSubmitLoading(false)
-      })
+      .finally(() => setSubmitLoading(false))
   }
 
   return (
     <PageContainer loading={loading}>
-      {contextHolder}
+      {messageContextHolder}
+      {deleteModalContextHolder}
       {!params.id && <Empty/>}
-      {data && <>
+      {photo && <>
         <Divider orientation='left'>
           <InfoOutlined/> 信息
         </Divider>
         <Descriptions style={{paddingTop: 8}}>
-          <Descriptions.Item label="ID">{data.id}</Descriptions.Item>
-          <Descriptions.Item label="作品标题">{data.title}</Descriptions.Item>
-          <Descriptions.Item label="拍摄地点">{data.location}</Descriptions.Item>
-          <Descriptions.Item label="宽度">{data.width}</Descriptions.Item>
-          <Descriptions.Item label="高度">{data.height}</Descriptions.Item>
-          <Descriptions.Item label="创建时间">{data.createTime}</Descriptions.Item>
+          <Descriptions.Item label="ID">{photo.id}</Descriptions.Item>
+          <Descriptions.Item label="作品标题">{photo.title}</Descriptions.Item>
+          <Descriptions.Item label="拍摄地点">{photo.location}</Descriptions.Item>
+          <Descriptions.Item label="宽度">{photo.width}</Descriptions.Item>
+          <Descriptions.Item label="高度">{photo.height}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">{photo.createTime}</Descriptions.Item>
         </Descriptions>
         <Divider orientation='left'>
           <ToolOutlined/> 操作
         </Divider>
         <Space wrap>
           <Button icon={<EyeOutlined/>}
-                  href={`${baseUrl}/Photography/Photo/${data.id}`} target='_blank'>在博客上查看</Button>
+                  href={`${baseUrl}/Photography/Photo/${photo.id}`} target='_blank'>在博客上查看</Button>
           <Button icon={<CheckOutlined/>}>设置推荐</Button>
           <Button icon={<CloseOutlined/>}>取消推荐</Button>
-          <Button icon={<DeleteOutlined/>} danger>删除</Button>
+          <Button icon={<DeleteOutlined/>} danger loading={deleteLoading} onClick={handleDelete}>删除</Button>
         </Space>
         <Divider orientation='left'>
           <EditOutlined/> 编辑
         </Divider>
         <Row gutter={8}>
           <Col xl={6}>
-            <Image src={`${baseUrl}/media/photography/${data.id}.jpg`}/>
+            <Image src={`${baseUrl}/media/photography/${photo.id}.jpg`}/>
           </Col>
           <Col xl={18}>
             <Form
@@ -88,9 +112,9 @@ export default function () {
               // labelCol={{span: 4}}
               // wrapperCol={{span: 20}}
               style={{margin: 8}}
-              initialValues={data}
+              initialValues={photo}
               autoComplete='off'
-              onFinish={onFormFinish}
+              onFinish={handleUpdate}
             >
               <Form.Item label="作品标题" name="title" rules={[{required: true, message: '请输入作品标题'}]}>
                 <Input/>

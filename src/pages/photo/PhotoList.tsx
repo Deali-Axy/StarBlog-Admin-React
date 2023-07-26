@@ -116,9 +116,10 @@ const PhotoList: React.FC = () => {
         />
       ]}>
       {contextHolder}
-      <Masonry columns={6} spacing={2}>
+      {/* todo 修复可能会触发警告的地方 */}
+      {data && <Masonry columns={6} spacing={2}>
         {/* @ts-ignore */}
-        {data && data.list?.map(item =>
+        {data.list?.map(item =>
           <PhotoCard
             key={item.id}
             photo={item}
@@ -127,8 +128,7 @@ const PhotoList: React.FC = () => {
               setEditModalOpen(true)
             }}
           />)}
-      </Masonry>
-
+      </Masonry>}
       <EditModal/>
     </PageContainer>
   )
